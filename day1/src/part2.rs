@@ -36,21 +36,20 @@ fn parse(s: &str) -> IResult<&str, Vec<Rotation>> {
 pub fn solve(s: &str) -> i32 {
     let (_, v) = parse(s).expect("input should be valid");
     let mut pos: i32 = 50;
-    v.iter()
-        .fold(0, |acc, r| {
-            let mut cross = 0;
-            for _ in 0..r.steps {
-                match r.direction {
-                    Direction::Left  => pos = (pos - 1).rem_euclid(100),
-                    Direction::Right => pos = (pos + 1).rem_euclid(100)
-                };
-                if pos == 0 {
-                    cross += 1
-                }
+    v.iter().fold(0, |acc, r| {
+        let mut cross = 0;
+        for _ in 0..r.steps {
+            match r.direction {
+                Direction::Left => pos = (pos - 1).rem_euclid(100),
+                Direction::Right => pos = (pos + 1).rem_euclid(100),
+            };
+            if pos == 0 {
+                cross += 1
             }
+        }
 
-            cross + acc
-        })
+        cross + acc
+    })
 }
 
 #[cfg(test)]
