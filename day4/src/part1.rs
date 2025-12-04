@@ -1,0 +1,84 @@
+use std::collections::HashMap;
+
+use glam::IVec2;
+use nom::{
+    character::complete::{line_ending, one_of},
+    multi::{many1, separated_list1},
+    IResult,
+};
+
+use nom_locate::LocatedSpan;
+
+type Span<'a> = LocatedSpan<&'a str>;
+
+const DIRECTIONS: [IVec2; 8] = [
+    IVec2::new(1, 0),
+    IVec2::new(-1, 0),
+    IVec2::new(0, 1),
+    IVec2::new(0, -1),
+    IVec2::new(1, 1),
+    IVec2::new(1, -1),
+    IVec2::new(-1, 1),
+    IVec2::new(-1, -1),
+];
+
+fn parse_cell(s: Span) -> IResult<Span, (IVec2, bool)> {
+    let x = s.location_line() as i32 - 1;
+    let y = s.get_column() as i32 - 1;
+    let (s, c) = one_of("@.")(s)?;
+    let c = matches!(c, '@');
+    Ok((s, (IVec2::new(x, y), c)))
+}
+
+fn parse(s: Span) -> IResult<Span, HashMap<IVec2, bool>> {
+    let (s, v) = separated_list1(line_ending, many1(parse_cell))(s)?;
+    Ok((s, v.into_iter().flatten().collect::<HashMap<IVec2, bool>>()))
+}
+
+pub fn solve(s: &str) -> usize {
+    let (_, v) = parse(Span::new(s)).expect("input should be valid");
+
+    v.keys()
+        .filter(|&cell| {
+            let this_cell = v.get(cell).expect("this cell should exist");
+            if !this_cell {
+                return false;
+            }
+            let count = DIRECTIONS.iter().fold(0, |acc, dir| {
+                if let Some(content) = v.get(&(cell + dir)) {
+                    if *content {
+                        return acc + 1;
+                    }
+                }
+                acc
+            });
+            count < 4
+        })
+        .count()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test1() {
+        let data = "..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.";
+        assert_eq!(solve(data), 13);
+    }
+
+    #[test]
+    fn test2() {
+        let data = std::fs::read_to_string("input/input.txt").unwrap();
+        assert_eq!(solve(&data.trim()), 1553);
+    }
+}
