@@ -12,5 +12,5 @@ glam = "0.29"
 nom_locate = "4.2"
 pathfinding = "4.14"
 rstest = "0.26"
-
+z3 = "0.19.6"
 
