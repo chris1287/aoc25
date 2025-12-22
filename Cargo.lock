@@ -98,6 +98,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "day12"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "nom",
+]
+
+[[package]]
 name = "day2"
 version = "0.1.0"
 dependencies = [
