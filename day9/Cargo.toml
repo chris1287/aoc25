@@ -7,4 +7,6 @@ edition = "2021"
 nom.workspace = true
 glam.workspace = true
 itertools.workspace = true
+geo = "0.32.0"
+geo-types = "0.7.18"
 
